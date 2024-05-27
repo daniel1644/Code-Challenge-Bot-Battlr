@@ -10,7 +10,7 @@ function BotsPage() {
     fetch("http://localhost:8002/bots")
    .then(response => response.json())
    .then((data)=>{
-     setBots(data)
+   setBots(data)
      console.log(data)
    })
   },[])

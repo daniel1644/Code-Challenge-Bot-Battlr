@@ -1,78 +1,42 @@
-import React from "react";
+import React, { useState , useEffect} from "react";
+import YourBotArmy from "./YourBotArmy";
+import BotCollection from "./BotCollection";
 
-const botTypeClasses = {
-  Assault: "icon military",
-  Defender: "icon shield",
-  Support: "icon plus circle",
-  Medic: "icon ambulance",
-  Witch: "icon magic",
-  Captain: "icon star",
-};
+function BotsPage() {
+  //start here with your code for step one
+  const [bots, setBots]= useState([])
 
-function BotSpecs({ bot }) {
+  useEffect(()=>{
+    fetch("http://localhost:8002/bots")
+   .then(response => response.json())
+   .then((data)=>{
+     setBots(data)
+     console.log(data)
+   })
+  },[])
+
+  function enlistBot(bot){
+    setBots(bots.map((b)=>(b.id === bot.id ? {...bot, army: true} : b)))
+  }
+
+  function detachBot(bot){
+    setBots(bots.map((b)=>(b.id === bot.id? {...bot, army: false} : b)))
+  }
+
+  function deleteBot(bot){
+    setBots(bots.filter((b)=>b.id!== bot.id))
+  }
+
   return (
-    <div className="ui segment">
-      <div className="ui two column centered grid">
-        <div className="row">
-          <div className="four wide column">
-            <img
-              alt="oh no!"
-              className="ui medium circular image bordered"
-              src={bot.avatar_url}
-            />
-          </div>
-          <div className="four wide column">
-            <h2>Name: {bot.name}</h2>
-            <p>
-              <strong>Catchphrase: </strong>
-              {bot.catchphrase}
-            </p>
-            <strong>
-              Class: {bot.bot_class}
-              <i className={botTypeClasses[bot.bot_class]} />
-            </strong>
-            <br />
-            <div className="ui segment">
-              <div className="ui three column centered grid">
-                <div className="row">
-                  <div className="column">
-                    <i className="icon large circular red heartbeat" />
-                    <strong>{bot.health}</strong>
-                  </div>
-                  <div className="column">
-                    <i className="icon large circular yellow lightning" />
-                    <strong>{bot.damage}</strong>
-                  </div>
-                  <div className="column">
-                    <i className="icon large circular blue shield" />
-                    <strong>{bot.armor}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <button
-              className="ui button fluid"
-              onClick={() =>
-                console.log("connect this to a function that shows all bots")
-              }
-            >
-              Go Back
-            </button>
-            <button
-              className="ui button fluid"
-              onClick={() =>
-                console.log(
-                  "connect this to a function that adds this bot to your bot army list"
-                )
-              }
-            >
-              Enlist
-            </button>
-          </div>
-        </div>
-      </div>
+    <div>
+      <YourBotArmy bots={bots.filter((b)=>b.army)}
+      detachBot={detachBot}
+      deleteBot={deleteBot}
+      />
+      <BotCollection bots={bots} enlistBot={enlistBot}  deleteBot={deleteBot}
+ />
     </div>
-  );
+  )
 }
 
-export default BotSpecs;
+export default BotsPage;
