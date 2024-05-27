@@ -1,31 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import BotCard from "./BotCard";
-import SortBar from "./SortBar";
 
-function BotCollection({ bots, onSelectBot }) {
-  const [sortedBy, setSortedBy] = useState(null);
+function BotCollection({ bots , enlistBot, deleteBot }) {
+  // Your code here
 
-  const sortBots = (property) => {
-    const sortedBots = [...bots].sort((a, b) => a[property] - b[property]);
-    setSortedBy(property);
-    onSelectBot(sortedBots);
-  };
-
+  const botItem =  bots.map((bot) => {
+    return (
+      <BotCard
+        key={bot.id}
+        bot={bot}
+        clickEvent={enlistBot}
+        deleteBot={deleteBot}
+      />
+    );
+  })
+ 
   return (
-    <>
-      <SortBar onSort={sortBots} />
-      <div className="ui four column grid">
-        <div className="row">
-          {bots.map(bot => (
-            <BotCard
-              key={bot.id}
-              bot={bot}
-              onSelect={() => onSelectBot(bot)}
-            />
-          ))}
-        </div>
+    <div className="ui four column grid">
+      <div className="row">
+        {botItem}
+        Collection of all bots
       </div>
-    </>
+    </div>
   );
 }
 

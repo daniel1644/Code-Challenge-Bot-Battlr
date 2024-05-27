@@ -7,12 +7,16 @@ const botTypeClasses = {
   Medic: "icon ambulance",
   Witch: "icon magic",
   Captain: "icon star",
-}; 
+};
 
-function BotCard({ bot, onSelect, onDelete, onEnlist }) {
+function BotCard({ bot, clickEvent, deleteBot }) {
   return (
     <div className="ui column">
-      <div className="ui card" key={bot.id}>
+      <div
+        className="ui card"
+        key={bot.id}
+        onClick={() => clickEvent(bot)}
+      >
         <div className="image">
           <img alt="oh no!" src={bot.avatar_url} />
         </div>
@@ -41,8 +45,17 @@ function BotCard({ bot, onSelect, onDelete, onEnlist }) {
           </span>
           <span>
             <div className="ui center aligned segment basic">
-              <button className="ui mini red button" onClick={onDelete}>x</button>
-              <button className="ui mini blue button" onClick={onEnlist}>Enlist</button>
+              <button
+                className="ui mini red button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  deleteBot(bot);
+                }}
+                  
+                
+              >
+                x
+              </button>
             </div>
           </span>
         </div>

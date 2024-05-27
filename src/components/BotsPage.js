@@ -1,76 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useState , useEffect} from "react";
 import YourBotArmy from "./YourBotArmy";
 import BotCollection from "./BotCollection";
-import BotSpecs from "./BotSpecs";
-import SortBar from "./SortBar";
 
 function BotsPage() {
-  const [bots, setBots] = useState([]);
-  const [selectedBot, setSelectedBot] = useState(null);
-  const [botArmy, setBotArmy] = useState([]);
-  const [filteredBots, setFilteredBots] = useState([]);
+  //start here with your code for step one
+  const [bots, setBots]= useState([])
 
-  useEffect(() => {
+  useEffect(()=>{
     fetch("http://localhost:8002/bots")
-      .then(response => response.json())
-      .then(data => {
-        setBots(data);
-        setFilteredBots(data);
-      })
-      .catch(error => console.error("Error fetching bots:", error));
-  }, []);
+   .then(response => response.json())
+   .then((data)=>{
+     setBots(data)
+     console.log(data)
+   })
+  },[])
 
-  const handleSelectBot = (bot) => {
-    setSelectedBot(bot);
-  };
+  function enlistBot(bot){
+    setBots(bots.map((b)=>(b.id === bot.id ? {...bot, army: true} : b)))
+  }
 
-  const handleEnlist = (bot) => {
-    if (!botArmy.some(b => b.id === bot.id)) {
-      setBotArmy([...botArmy, bot]);
-      setFilteredBots(filteredBots.filter(b => b.id !== bot.id));
-    }
-    setSelectedBot(null);
-  };
+  function detachBot(bot){
+    setBots(bots.map((b)=>(b.id === bot.id? {...bot, army: false} : b)))
+  }
 
-  const handleReleaseBot = (botToRelease) => {
-    setBotArmy(botArmy.filter(bot => bot.id !== botToRelease.id));
-  };
-
-  const handleDeleteBot = (botToDelete) => {
-    fetch(`http://localhost:8002/bots/${botToDelete.id}`, {
-      method: "DELETE"
-    })
-      .then(() => {
-        setBotArmy(botArmy.filter(bot => bot.id !== botToDelete.id));
-        setBots(bots.filter(bot => bot.id !== botToDelete.id));
-        setFilteredBots(filteredBots.filter(bot => bot.id !== botToDelete.id));
-      })
-      .catch(error => console.error("Error deleting bot:", error));
-  };
-
-  const sortBots = (property) => {
-    const sortedBots = [...filteredBots].sort((a, b) => a[property] - b[property]);
-    setFilteredBots(sortedBots);
-  };
-
-  const filterBotsByClass = (botClass) => {
-    const filteredByClass = bots.filter(bot => bot.bot_class === botClass);
-    setFilteredBots(filteredByClass);
-  };
+  function deleteBot(bot){
+    setBots(bots.filter((b)=>b.id!== bot.id))
+  }
 
   return (
     <div>
-      {selectedBot ? (
-        <BotSpecs bot={selectedBot} onGoBack={() => setSelectedBot(null)} onEnlist={handleEnlist} />
-      ) : (
-        <>
-          <YourBotArmy bots={botArmy} onReleaseBot={handleReleaseBot} onDeleteBot={handleDeleteBot} />
-          <SortBar onSort={sortBots} />
-          <BotCollection bots={filteredBots} onSelectBot={handleSelectBot} />
-        </>
-      )}
+      <YourBotArmy bots={bots.filter((b)=>b.army)}
+      detachBot={detachBot}
+      deleteBot={deleteBot}
+      />
+      <BotCollection bots={bots} enlistBot={enlistBot}  deleteBot={deleteBot}
+ />
     </div>
-  );
+  )
 }
 
 export default BotsPage;
